@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Current Stock Prices</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="background">
+      <div id="container">
+        <div class="title">Stock Lookup</div>
+        <div class="input-wrapper">
+          <input
+            placeholder="Enter stock symbol or company name"
+            type="text"
+            id="symbol-input"
+          />
+          <button id="search-button">
+            <img src="Arrow.svg" alt="search" />
+          </button>
+        </div>
+      </div>
+      <div class="result-area">
+        <div id="result" class="result"></div>
+        <div id="pricing" class="stock-pricing"></div>
+      </div>
+    </div>
+    <script src="config.js"></script>
+    <script>
+      function typeWriter(text, element, speed = 30) {
+        element.innerHTML = "";
+        let i = 0;
+
+        function type() {
+          if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+          }
+        }
+        type();
+      }
+
+      let ticker = "";
+      let corpName = "";
+
+      //first API endpoint access - get ticker or company name
+
+      document
+        .querySelector("#search-button")
+        .addEventListener("click", (event) => {
+          const userSearch = document
+            .querySelector("#symbol-input")
+            .value.trim()
+            .toUpperCase();
+          if (!userSearch || typeof userSearch !== "string") {
+            document.querySelector("#result").textContent =
+              "Please enter a stock symbol or company name";
+            return;
+          }
+          fetch(
+            `https://finnhub.io/api/v1/search?q=${userSearch}&exchange=US&token=${apiKey}`
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              ticker = data.result[0].symbol;
+              corpName = data.result[0].description;
+
+              //second API endpoint access - get ticker or company name
+
+              return fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`
+              )
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                  }
+                  return response.json();
+                })
+                .then((data) => {
+                  document.querySelector(
+                    "#result"
+                  ).innerHTML = `<div>${corpName} (${ticker})<br><div>`;
+                  document.querySelector(
+                    "#pricing"
+                  ).innerHTML = `<div>Current price: $${data.c}</div>
+                    <div>High: $${data.h}</div>
+                    <div>Low: $${data.l}</div>`;
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  document.querySelector(
+                    "#result"
+                  ).textContent = `Error fetching financial data for ${userSearch}.`;
+                });
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.querySelector(
+                "#result"
+              ).textContent = `Error fetching data for ${userSearch}. Ensure that company name or ticker is correct.`;
+            });
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+For the user input for searching a company name or stock ticker:
+Checking to see if either the ticker finds a match OR if the company name finds a match. 
+    if the stock ticker matches, return stock ticker and company name
+    if the company name matches, return stock ticker and company name
+        all userSearch inputs are automatically toUpperCase
+
+    first use .find to find a stock ticker - either find co name or ticker
+    once we find match, return found as variable we will use for second endpoint, the ticker
+    also once we find, return co name
