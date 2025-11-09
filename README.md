@@ -1,2 +1,3 @@
 # stocks-api-project
-Simple stock/corporation lookup using API to fetch stock price information
+
+A very simple stock lookup app built with vanilla JavaScript, HTML, and CSS that uses an external API to fetch real-time stock data (current price and daily highs/lows). Built as an early project and currently desktop-only.
